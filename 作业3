@@ -1,0 +1,167 @@
+#include <malloc.h>
+#include <queue>
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+
+#define NumVertex 1001
+
+bool visited[NumVertex];
+
+using namespace std;
+
+typedef struct node
+{
+    int adjvex;//邻接点信息
+    node *next;//下一个邻接点指针
+}EgdeNode;
+
+typedef struct
+{
+    int vertex;//节点信息
+    EgdeNode *firstedge;//第一个邻接点指针
+}VertexNode;
+typedef struct
+{
+    VertexNode vexlist[NumVertex];//图的节点
+    int n,e;//节点数和边数
+}AdjGraph;
+void CreateGraph(AdjGraph *G)
+{
+    int i,head,tail;
+	int n;
+    G->n = 1000;
+	G->e = 1000;
+	for( i=0 ; i < G->n ; i++ )
+	{
+        G->vexlist[i].vertex=i ;//存入节点信息
+        G->vexlist[i].firstedge = NULL ;
+    }
+    for( i=0 ; i < G->e ; i++ )
+	{
+		while(1)
+		{
+		n=rand()%1000;//从1000里随机生成1个数
+		if(i!=n)
+			break;                     	}                                                                                                 ;
+        tail=n;
+		head=i ;		                 
+        EgdeNode * p = (EgdeNode *)malloc(sizeof(node));
+        p -> adjvex = head;//存入节点信息
+        p -> next = G->vexlist[tail].firstedge;
+        G->vexlist[tail].firstedge = p;//连接第一个邻接点
+        EgdeNode * q = (EgdeNode *)malloc(sizeof(node));
+        q -> adjvex = tail;//存入邻接点信息
+        q -> next = G->vexlist[head].firstedge;
+        G->vexlist[head].firstedge = q;
+    }
+}
+void BFS1(AdjGraph *G , int i)
+{
+    queue <int> q;//初始化队列q
+    EgdeNode * p = (EgdeNode *)malloc(sizeof(node));
+    visited[i] = true;
+    q.push(i);//节点i入队
+    while( !q.empty() )
+	{
+        i = q.front();
+        q.pop();
+        p = G->vexlist[i].firstedge;
+        while(p)
+		{
+            if( !visited[p->adjvex] )
+			{
+                visited[p->adjvex] = true ;
+                q.push(p->adjvex);
+            }
+            p = p->next;
+		}
+    }
+}
+
+ 
+
+void BFSTraverse1(AdjGraph *G)
+{
+    int i,j,t;
+    for( i = 0 ; i < G->n ; i++ )
+	{
+        visited[i] = false ;//将所有节点初始化为未读
+
+    }
+
+    for ( i= 0 ; i < G->n ; i++ )
+	{
+
+         BFS1(G,0);//广度优先遍历图
+		 for(j=0;j<G->n;j++)
+		 {
+			 if(!visited[j])
+			 {
+				EgdeNode * p = (EgdeNode *)malloc(sizeof(node));
+				 p -> adjvex = 0;
+				 p -> next = G->vexlist[j].firstedge;
+				 G->vexlist[j].firstedge = p;
+					 EgdeNode * q = (EgdeNode *)malloc(sizeof(node));
+				 q -> adjvex = j;
+				 q -> next = G->vexlist[0].firstedge;
+				 G->vexlist[0].firstedge = q;
+				 break;
+			 }
+		 }
+		  for( t = 0 ; t < G->n ; t++ )
+		  {
+			visited[t] = false ;//再次将所有节点初始化未读
+         }
+    }
+}
+int a[1000];//建立数组预存节点数据
+int f=0;
+void DFS(AdjGraph *G , int i)
+{
+	
+    EgdeNode * p = (EgdeNode *)malloc(sizeof(node));
+    a[f]=G->vexlist[i].vertex;
+    visited[i] = true;//遍历过的节点设置成已读
+	f++;
+    p = G->vexlist[i].firstedge;
+    while(p)
+	{       if( !visited[p->adjvex] ) //邻接点是否为空
+			DFS(G,p->adjvex);//不为空继续深度遍历
+	else//若为空
+	{
+		if(f>2)//数组存的数据个数看是否大于2
+		{
+		for(int k=0;k<=f-1;k++)
+			printf("%d->",a[k]);//循环输出数组数据	
+		    printf("%d",a[0]);//将第一个数据输出
+		    printf("\n");
+		}
+		f=0;//将数组清空
+		p=p->next;//遍历下一个节点
+	}
+}
+}
+
+void DFSTraverse(AdjGraph *G)
+{
+    int i;
+    for( i = 0 ; i < G->n ; i++ ){
+        visited[i] = false将数据置成未读
+    }
+    for ( i= 0 ; i < G->n ; i++ ){
+        if(!visited[i]) 
+			DFS(G,i);
+    }
+}
+
+int main()
+{
+    AdjGraph G;//创建图指针
+    CreateGraph(&G);//创建图
+	BFSTraverse1(&G);//测试图是否连通
+    DFSTraverse(&G);//查找所有环并输出
+    cout<<endl;
+	system("pause");
+    return 0;
+}
